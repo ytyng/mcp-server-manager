@@ -10,7 +10,7 @@
   ] as const;
 </script>
 
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+<div class="bg-white dark:bg-gray-800 h-full flex flex-col">
   <div class="border-b border-gray-200 dark:border-gray-700">
     <nav class="flex" aria-label="Tabs">
       {#each tabs as tab}
@@ -26,8 +26,7 @@
       {/each}
     </nav>
   </div>
-
-  <div class="p-4">
+  <div class="grow overflow-hidden">
     {@render children()}
   </div>
 </div>

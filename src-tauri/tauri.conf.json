@@ -13,7 +13,7 @@
     "windows": [
       {
         "title": "MCP Server Manager",
-        "width": 900,
+        "width": 500,
         "height": 700
       }
     ],

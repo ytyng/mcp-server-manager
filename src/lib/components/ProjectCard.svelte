@@ -32,7 +32,7 @@
   }
 </script>
 
-<div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+<div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shrink-0">
   <button
     onclick={() => (expanded = !expanded)}
     class="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex items-center justify-between"

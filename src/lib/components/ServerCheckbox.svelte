@@ -19,7 +19,7 @@
            rounded focus:ring-blue-500 dark:bg-gray-700
            dark:border-gray-600 cursor-pointer"
   />
-  <span class="text-sm text-gray-700 dark:text-gray-300">
+  <span class="text-gray-700 dark:text-gray-300 font-semibold">
     {label}
   </span>
 </label>
