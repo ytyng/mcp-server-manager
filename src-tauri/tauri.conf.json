@@ -12,13 +12,25 @@
   "app": {
     "windows": [
       {
-        "title": "mcp-server-manager",
-        "width": 800,
-        "height": 600
+        "title": "MCP Server Manager",
+        "width": 900,
+        "height": 700
       }
     ],
     "security": {
       "csp": null
+    }
+  },
+  "plugins": {
+    "cli": {
+      "args": [
+        {
+          "name": "project",
+          "short": "p",
+          "takesValue": true,
+          "description": "Default project filter"
+        }
+      ]
     }
   },
   "bundle": {
