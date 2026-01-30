@@ -1,71 +1,75 @@
 # MCP Server Manager
 
-`~/.claude.json` を編集して MCP サーバーの ON/OFF を管理する Tauri デスクトップアプリ
+![](./src-tauri/icons/128x128@2x.png)
 
-## 機能
+A desktop app to manage MCP server ON/OFF states by editing `~/.claude.json`.
 
-### Global タブ
-- `mcpServers` と `disabledMcpServers` 間でサーバー設定を移動
-- チェック ON: `disabledMcpServers` → `mcpServers`
-- チェック OFF: `mcpServers` → `disabledMcpServers`
+![](./documents/images/flashcap-20260130-111602.png)
 
-### Projects タブ
-- プロジェクト一覧をフィルタリング表示
-- プロジェクト別の `disabledMcpServers` 配列を編集
+## Features
 
-## 技術スタック
+### Global Tab
+- Move server configurations between `mcpServers` and `disabledMcpServers`
+- Check ON: `disabledMcpServers` → `mcpServers`
+- Check OFF: `mcpServers` → `disabledMcpServers`
 
-### フロントエンド
+### Projects Tab
+- Filter and display project list
+- Edit per-project `disabledMcpServers` array
+
+## Tech Stack
+
+### Frontend
 - SvelteKit v2
 - Svelte 5
 - TypeScript
 - Tailwind CSS v4
-- svelte-sonner (トースト通知)
+- svelte-sonner (toast notifications)
 
-### バックエンド
+### Backend
 - Tauri v2
 - Rust
-- serde_json (JSON操作)
-- dirs (ホームディレクトリ取得)
+- serde_json (JSON manipulation)
+- dirs (home directory resolution)
 
-## 開発
+## Development
 
 ```bash
-# 依存パッケージのインストール
+# Install dependencies
 pnpm install
 
-# 開発サーバー起動
+# Start development server
 pnpm tauri dev
 ```
 
-## ビルド
+## Build
 
 ```bash
-# プロダクションビルド
+# Production build
 pnpm tauri build
 ```
 
-成果物:
+Artifacts:
 - `src-tauri/target/release/bundle/macos/mcp-server-manager.app`
 - `src-tauri/target/release/bundle/dmg/mcp-server-manager_x.x.x_aarch64.dmg`
 
-## CLI 引数
+## CLI Arguments
 
 ```bash
-# プロジェクトタブをデフォルト表示 + フィルター適用
+# Open with Projects tab as default + apply filter
 mcp-server-manager --project=<filter>
 mcp-server-manager -p <filter>
 ```
 
-## プロジェクト構造
+## Project Structure
 
 ```
 src/
-├── app.css                     # Tailwind CSS エントリ
+├── app.css                     # Tailwind CSS entry
 ├── lib/
-│   ├── api.ts                  # Tauri コマンドラッパー
+│   ├── api.ts                  # Tauri command wrapper
 │   ├── stores.ts               # Svelte stores
-│   ├── types.ts                # TypeScript 型定義
+│   ├── types.ts                # TypeScript type definitions
 │   └── components/
 │       ├── GlobalSettings.svelte
 │       ├── ProjectSettings.svelte
@@ -78,10 +82,10 @@ src/
 
 src-tauri/
 ├── src/
-│   ├── lib.rs                  # Tauri エントリ
-│   ├── claude_config.rs        # JSON 読み書きユーティリティ
-│   └── commands.rs             # Tauri コマンド
-├── icons/                      # アプリアイコン
+│   ├── lib.rs                  # Tauri entry point
+│   ├── claude_config.rs        # JSON read/write utilities
+│   └── commands.rs             # Tauri commands
+├── icons/                      # App icons
 ├── Cargo.toml
 └── tauri.conf.json
 ```
