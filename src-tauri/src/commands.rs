@@ -1,4 +1,7 @@
-use crate::claude_config::{read_config, write_config};
+use crate::claude_config::{
+    read_config, read_desktop_config, read_desktop_manager_config, write_config,
+    write_desktop_config, write_desktop_manager_config,
+};
 use serde::Serialize;
 use serde_json::Value;
 
@@ -86,6 +89,100 @@ pub fn set_server_enabled(name: String, enabled: bool) -> Result<(), String> {
     to_servers.insert(name, server_config);
 
     write_config(&config)
+}
+
+/// Claude Desktop MCP サーバー一覧取得
+/// enabled: claude_desktop_config.json の mcpServers
+/// disabled: mcp-server-manager-config.json の disabledMcpServers
+#[tauri::command]
+pub fn get_desktop_mcp_servers() -> Result<Vec<McpServerInfo>, String> {
+    let desktop_config = read_desktop_config()?;
+    let manager_config = read_desktop_manager_config()?;
+    let mut servers = Vec::new();
+
+    if let Some(mcp_servers) = desktop_config.get("mcpServers").and_then(|s| s.as_object()) {
+        for name in mcp_servers.keys() {
+            servers.push(McpServerInfo {
+                name: name.clone(),
+                enabled: true,
+            });
+        }
+    }
+
+    if let Some(disabled) = manager_config.get("disabledMcpServers").and_then(|s| s.as_object()) {
+        for name in disabled.keys() {
+            servers.push(McpServerInfo {
+                name: name.clone(),
+                enabled: false,
+            });
+        }
+    }
+
+    servers.sort_by(|a, b| a.name.cmp(&b.name));
+    Ok(servers)
+}
+
+/// Claude Desktop サーバーの有効/無効切替
+/// 無効化: claude_desktop_config.json から削除 → mcp-server-manager-config.json に退避
+/// 有効化: mcp-server-manager-config.json から削除 → claude_desktop_config.json に復元
+#[tauri::command]
+pub fn set_desktop_server_enabled(name: String, enabled: bool) -> Result<(), String> {
+    let mut desktop_config = read_desktop_config()?;
+    let mut manager_config = read_desktop_manager_config()?;
+
+    if enabled {
+        // manager の disabledMcpServers から取り出して desktop の mcpServers に戻す
+        let server_config = {
+            let disabled = manager_config
+                .get_mut("disabledMcpServers")
+                .and_then(|s| s.as_object_mut())
+                .ok_or("No disabledMcpServers in manager config")?;
+            disabled
+                .remove(&name)
+                .ok_or_else(|| format!("Server '{}' not found in disabled servers", name))?
+        };
+
+        if desktop_config.get("mcpServers").is_none() {
+            desktop_config
+                .as_object_mut()
+                .expect("config is always an object")
+                .insert("mcpServers".to_string(), serde_json::json!({}));
+        }
+        desktop_config
+            .get_mut("mcpServers")
+            .and_then(|s| s.as_object_mut())
+            .expect("just ensured mcpServers exists")
+            .insert(name, server_config);
+
+        write_desktop_config(&desktop_config)?;
+        write_desktop_manager_config(&manager_config)
+    } else {
+        // desktop の mcpServers から取り出して manager の disabledMcpServers に退避
+        let server_config = {
+            let mcp_servers = desktop_config
+                .get_mut("mcpServers")
+                .and_then(|s| s.as_object_mut())
+                .ok_or("No mcpServers in desktop config")?;
+            mcp_servers
+                .remove(&name)
+                .ok_or_else(|| format!("Server '{}' not found in mcpServers", name))?
+        };
+
+        if manager_config.get("disabledMcpServers").is_none() {
+            manager_config
+                .as_object_mut()
+                .expect("config is always an object")
+                .insert("disabledMcpServers".to_string(), serde_json::json!({}));
+        }
+        manager_config
+            .get_mut("disabledMcpServers")
+            .and_then(|s| s.as_object_mut())
+            .expect("just ensured disabledMcpServers exists")
+            .insert(name, server_config);
+
+        write_desktop_config(&desktop_config)?;
+        write_desktop_manager_config(&manager_config)
+    }
 }
 
 /// プロジェクト一覧取得

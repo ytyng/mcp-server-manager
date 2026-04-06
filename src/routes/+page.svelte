@@ -4,15 +4,17 @@
   import { getMatches } from "@tauri-apps/plugin-cli";
   import TabContainer from "$lib/components/TabContainer.svelte";
   import GlobalSettings from "$lib/components/GlobalSettings.svelte";
+  import DesktopSettings from "$lib/components/DesktopSettings.svelte";
   import ProjectSettings from "$lib/components/ProjectSettings.svelte";
   import {
     servers,
+    desktopServers,
     projects,
     activeTab,
     projectFilter,
     isLoading,
   } from "$lib/stores";
-  import { getMcpServers, getProjects } from "$lib/api";
+  import { getMcpServers, getDesktopMcpServers, getProjects } from "$lib/api";
 
   onMount(async () => {
     // CLI 引数チェック
@@ -29,6 +31,7 @@
     // データ読み込み
     try {
       $servers = await getMcpServers();
+      $desktopServers = await getDesktopMcpServers();
       $projects = await getProjects();
     } catch (e) {
       toast.error(`Failed to load config: ${e}`);
@@ -46,6 +49,8 @@
   <TabContainer>
     {#if $activeTab === "global"}
       <GlobalSettings />
+    {:else if $activeTab === "claude-desktop"}
+      <DesktopSettings />
     {:else}
       <ProjectSettings />
     {/if}

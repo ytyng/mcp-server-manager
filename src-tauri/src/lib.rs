@@ -1,7 +1,10 @@
 mod claude_config;
 mod commands;
 
-use commands::{get_mcp_servers, get_projects, set_project_disabled_servers, set_server_enabled};
+use commands::{
+    get_desktop_mcp_servers, get_mcp_servers, get_projects, set_desktop_server_enabled,
+    set_project_disabled_servers, set_server_enabled,
+};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -11,6 +14,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_mcp_servers,
             set_server_enabled,
+            get_desktop_mcp_servers,
+            set_desktop_server_enabled,
             get_projects,
             set_project_disabled_servers
         ])

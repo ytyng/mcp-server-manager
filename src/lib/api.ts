@@ -18,6 +18,17 @@ export async function setServerEnabled(
   await invoke("set_server_enabled", { name, enabled });
 }
 
+export async function getDesktopMcpServers(): Promise<McpServer[]> {
+  return await invoke<McpServer[]>("get_desktop_mcp_servers");
+}
+
+export async function setDesktopServerEnabled(
+  name: string,
+  enabled: boolean
+): Promise<void> {
+  await invoke("set_desktop_server_enabled", { name, enabled });
+}
+
 export async function getProjects(): Promise<Project[]> {
   const rawProjects = await invoke<RawProject[]>("get_projects");
   return rawProjects.map((p) => ({

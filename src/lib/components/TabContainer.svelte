@@ -5,7 +5,8 @@
   let { children }: { children: Snippet } = $props();
 
   const tabs = [
-    { id: "global", label: "Global" },
+    { id: "global", label: "Claude Code" },
+    { id: "claude-desktop", label: "Claude Desktop" },
     { id: "projects", label: "Projects" },
   ] as const;
 </script>

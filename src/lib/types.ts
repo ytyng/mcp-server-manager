@@ -9,4 +9,4 @@ export interface Project {
   disabledServers: string[];
 }
 
-export type TabType = "global" | "projects";
+export type TabType = "global" | "projects" | "claude-desktop";
