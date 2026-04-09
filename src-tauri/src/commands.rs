@@ -78,14 +78,14 @@ pub fn set_server_enabled(name: String, enabled: bool) -> Result<(), String> {
     if config.get(to_key).is_none() {
         config
             .as_object_mut()
-            .expect("config is always an object")
+            .ok_or("config root is not an object")?
             .insert(to_key.to_string(), serde_json::json!({}));
     }
 
     let to_servers = config
         .get_mut(to_key)
         .and_then(|s| s.as_object_mut())
-        .expect("just ensured to_key exists");
+        .ok_or_else(|| format!("{} is not an object", to_key))?;
     to_servers.insert(name, server_config);
 
     write_config(&config)
@@ -145,13 +145,13 @@ pub fn set_desktop_server_enabled(name: String, enabled: bool) -> Result<(), Str
         if desktop_config.get("mcpServers").is_none() {
             desktop_config
                 .as_object_mut()
-                .expect("config is always an object")
+                .ok_or("desktop config root is not an object")?
                 .insert("mcpServers".to_string(), serde_json::json!({}));
         }
         desktop_config
             .get_mut("mcpServers")
             .and_then(|s| s.as_object_mut())
-            .expect("just ensured mcpServers exists")
+            .ok_or("mcpServers is not an object")?
             .insert(name, server_config);
 
         write_desktop_config(&desktop_config)?;
@@ -171,13 +171,13 @@ pub fn set_desktop_server_enabled(name: String, enabled: bool) -> Result<(), Str
         if manager_config.get("disabledMcpServers").is_none() {
             manager_config
                 .as_object_mut()
-                .expect("config is always an object")
+                .ok_or("manager config root is not an object")?
                 .insert("disabledMcpServers".to_string(), serde_json::json!({}));
         }
         manager_config
             .get_mut("disabledMcpServers")
             .and_then(|s| s.as_object_mut())
-            .expect("just ensured disabledMcpServers exists")
+            .ok_or("disabledMcpServers is not an object")?
             .insert(name, server_config);
 
         write_desktop_config(&desktop_config)?;

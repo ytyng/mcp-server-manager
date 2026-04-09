@@ -28,16 +28,33 @@
       // CLI plugin not available (web preview)
     }
 
-    // データ読み込み
-    try {
-      $servers = await getMcpServers();
-      $desktopServers = await getDesktopMcpServers();
-      $projects = await getProjects();
-    } catch (e) {
-      toast.error(`Failed to load config: ${e}`);
-    } finally {
-      $isLoading = false;
+    // データ読み込み（個別にエラーハンドリングし、一部失敗でも他のデータは表示する）
+    const [serversResult, desktopServersResult, projectsResult] =
+      await Promise.allSettled([
+        getMcpServers(),
+        getDesktopMcpServers(),
+        getProjects(),
+      ]);
+
+    if (serversResult.status === "fulfilled") {
+      $servers = serversResult.value;
+    } else {
+      toast.error(`Failed to load global config: ${serversResult.reason}`);
     }
+
+    if (desktopServersResult.status === "fulfilled") {
+      $desktopServers = desktopServersResult.value;
+    } else {
+      toast.error(`Failed to load desktop config: ${desktopServersResult.reason}`);
+    }
+
+    if (projectsResult.status === "fulfilled") {
+      $projects = projectsResult.value;
+    } else {
+      toast.error(`Failed to load projects: ${projectsResult.reason}`);
+    }
+
+    $isLoading = false;
   });
 </script>
 
