@@ -24,10 +24,12 @@ pub struct ProjectInfo {
 pub fn get_mcp_servers() -> Result<Vec<McpServerInfo>, String> {
     let config = read_config()?;
     let mut servers = Vec::new();
+    let mut seen = std::collections::HashSet::new();
 
-    // mcpServers (enabled)
+    // mcpServers (enabled) を優先（不整合時に重複を防ぐ）
     if let Some(mcp_servers) = config.get("mcpServers").and_then(|s| s.as_object()) {
         for name in mcp_servers.keys() {
+            seen.insert(name.clone());
             servers.push(McpServerInfo {
                 name: name.clone(),
                 enabled: true,
@@ -35,13 +37,15 @@ pub fn get_mcp_servers() -> Result<Vec<McpServerInfo>, String> {
         }
     }
 
-    // disabledMcpServers (disabled)
+    // disabledMcpServers (disabled) - 既出はスキップ
     if let Some(disabled_servers) = config.get("disabledMcpServers").and_then(|s| s.as_object()) {
         for name in disabled_servers.keys() {
-            servers.push(McpServerInfo {
-                name: name.clone(),
-                enabled: false,
-            });
+            if seen.insert(name.clone()) {
+                servers.push(McpServerInfo {
+                    name: name.clone(),
+                    enabled: false,
+                });
+            }
         }
     }
 
@@ -99,9 +103,12 @@ pub fn get_desktop_mcp_servers() -> Result<Vec<McpServerInfo>, String> {
     let desktop_config = read_desktop_config()?;
     let manager_config = read_desktop_manager_config()?;
     let mut servers = Vec::new();
+    let mut seen = std::collections::HashSet::new();
 
+    // enabled サーバーを優先（不整合時に重複を防ぐ）
     if let Some(mcp_servers) = desktop_config.get("mcpServers").and_then(|s| s.as_object()) {
         for name in mcp_servers.keys() {
+            seen.insert(name.clone());
             servers.push(McpServerInfo {
                 name: name.clone(),
                 enabled: true,
@@ -111,10 +118,12 @@ pub fn get_desktop_mcp_servers() -> Result<Vec<McpServerInfo>, String> {
 
     if let Some(disabled) = manager_config.get("disabledMcpServers").and_then(|s| s.as_object()) {
         for name in disabled.keys() {
-            servers.push(McpServerInfo {
-                name: name.clone(),
-                enabled: false,
-            });
+            if seen.insert(name.clone()) {
+                servers.push(McpServerInfo {
+                    name: name.clone(),
+                    enabled: false,
+                });
+            }
         }
     }
 
@@ -189,10 +198,10 @@ pub fn set_desktop_server_enabled(name: String, enabled: bool) -> Result<(), Str
 #[tauri::command]
 pub fn get_projects() -> Result<Vec<ProjectInfo>, String> {
     let config = read_config()?;
-    let projects = config
-        .get("projects")
-        .and_then(|p| p.as_object())
-        .ok_or("No projects configured in ~/.claude.json")?;
+    // projects キーが無い場合は空リストを返す（新規環境では正常な状態）
+    let Some(projects) = config.get("projects").and_then(|p| p.as_object()) else {
+        return Ok(Vec::new());
+    };
 
     let mut result: Vec<ProjectInfo> = projects
         .iter()
