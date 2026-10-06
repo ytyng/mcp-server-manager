@@ -6,6 +6,14 @@ A desktop app to manage MCP server ON/OFF states by editing `~/.claude.json`.
 
 ![](./documents/images/flashcap-20260130-111602.png)
 
+## Install (macOS)
+
+```bash
+brew install --cask ytyng/tap/mcp-server-manager
+```
+
+Or download the dmg from [Releases](https://github.com/ytyng/mcp-server-manager/releases).
+
 ## Features
 
 ### Global Tab
@@ -52,6 +60,22 @@ pnpm tauri build
 Artifacts:
 - `src-tauri/target/release/bundle/macos/mcp-server-manager.app`
 - `src-tauri/target/release/bundle/dmg/mcp-server-manager_x.x.x_aarch64.dmg`
+
+## Release
+
+The version in `src-tauri/tauri.conf.json` on `main` decides the release.
+When it has no published GitHub Release yet, the `Release` workflow builds a
+signed and notarized universal dmg and publishes it as `v<version>`.
+The Homebrew tap picks up the new release within an hour.
+
+```bash
+pnpm release          # patch (default)
+pnpm release minor
+pnpm release major
+```
+
+Keep version bumps out of feature PRs: merging a PR that carries an
+unreleased version publishes it.
 
 ## CLI Arguments
 
