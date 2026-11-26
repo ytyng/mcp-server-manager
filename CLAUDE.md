@@ -1,45 +1,45 @@
 # CLAUDE.md
 
-このファイルは Claude Code がこのリポジトリで作業する際のガイダンスを提供する。
+This file provides guidance to Claude Code when working in this repository.
 
-## 技術スタック
+## Tech Stack
 
-- **Tauri v2** + Rust (バックエンド)
-- **SvelteKit v2** + Svelte 5 (フロントエンド)
-- **Tailwind CSS v4** (@tailwindcss/vite プラグイン使用)
+- **Tauri v2** + Rust (backend)
+- **SvelteKit v2** + Svelte 5 (frontend)
+- **Tailwind CSS v4** (using the @tailwindcss/vite plugin)
 - **TypeScript**
 
-### フレームワーク参照
+### Framework references
 
-Svelte 5、SvelteKit v2、Tailwind CSS v4、Tauri v2 は比較的新しいフレームワーク。
-開発時は **context7 MCP** を使用して最新のドキュメントを参照すること。
+Svelte 5, SvelteKit v2, Tailwind CSS v4, and Tauri v2 are relatively new frameworks.
+During development, use the **context7 MCP** to consult the latest documentation.
 
-## 開発コマンド
+## Development Commands
 
 ```bash
-# 開発サーバー起動
+# Start the development server
 pnpm tauri dev
 
-# プロダクションビルド
+# Production build
 pnpm tauri build
 
-# 型チェック
+# Type check
 pnpm check
 ```
 
-## アーキテクチャ
+## Architecture
 
-### フロントエンド (`src/`)
-- `lib/api.ts`: Tauri invoke ラッパー (snake_case → camelCase 変換)
+### Frontend (`src/`)
+- `lib/api.ts`: Tauri invoke wrapper (snake_case → camelCase conversion)
 - `lib/stores.ts`: Svelte writable stores
-- `lib/components/`: UI コンポーネント
+- `lib/components/`: UI components
 
-### バックエンド (`src-tauri/src/`)
-- `claude_config.rs`: `~/.claude.json` の読み書き
-- `commands.rs`: Tauri コマンド (get_mcp_servers, set_server_enabled, etc.)
-- `lib.rs`: プラグイン登録・コマンドハンドラ登録
+### Backend (`src-tauri/src/`)
+- `claude_config.rs`: Reads and writes `~/.claude.json`
+- `commands.rs`: Tauri commands (get_mcp_servers, set_server_enabled, etc.)
+- `lib.rs`: Plugin registration and command handler registration
 
-## JSON 構造 (配列移動方式)
+## JSON Structure (entries are moved between lists)
 
 ```json
 {
@@ -57,20 +57,20 @@ pnpm check
 }
 ```
 
-## アイコン作成手順
+## Creating the Icon
 
-1. ytyng-mcp-media の `get_icon_creator_url` でアイコン URL を生成
-2. curl でダウンロード: `curl -s "<url>" -o /tmp/icon.png`
-3. Tauri アイコン生成: `pnpm tauri icon /tmp/icon.png`
+1. Generate an icon URL with `get_icon_creator_url` in ytyng-mcp-media
+2. Download it with curl: `curl -s "<url>" -o /tmp/icon.png`
+3. Generate the Tauri icons: `pnpm tauri icon /tmp/icon.png`
 
-## コーディング規約
+## Coding Conventions
 
 ### Rust
-- エラーは `Result<T, String>` で返す
-- `unwrap()` は避け、`expect("理由")` か `?` を使用
-- コメントは日本語可
+- Return errors as `Result<T, String>`
+- Avoid `unwrap()`; use `expect("reason")` or `?`
+- Comments may be written in Japanese
 
 ### Svelte/TypeScript
-- Svelte 5 の runes (`$state`, `$derived`, `$props`) を使用
-- stores は `$` プレフィックスでアクセス
-- コンポーネント props は `$props()` で定義
+- Use Svelte 5 runes (`$state`, `$derived`, `$props`)
+- Access stores with the `$` prefix
+- Define component props with `$props()`
